@@ -11,7 +11,6 @@ struct State {
 	instruction_pointer: usize,
 	data_pointer: usize,
 	running: bool,
-	stack: Vec<usize>,
 }
 
 impl Default for State {
@@ -21,7 +20,6 @@ impl Default for State {
 			instruction_pointer: 0,
 			data_pointer: 0,
 			running: true,
-			stack: Vec::new(),
 		}
 	}
 }
@@ -83,16 +81,19 @@ fn main() {
 
 	let mut state = State::default();
 	while state.running {
-		print!("{}", characters[state.instruction_pointer]);
 		match characters[state.instruction_pointer] {
 			'>' => state.data_pointer += 1,
 			'<' => state.data_pointer -= 1,
 			'+' => state.memory[state.data_pointer] += 1,
 			'-' => state.memory[state.data_pointer] -= 1,
-			'[' => state.stack.push(state.instruction_pointer),
-			']' => match state.stack.pop() {
-				Some(value) => state.instruction_pointer = value,
-				None => state.running = false,
+			'[' => {
+				/* TODO: If byte at data pointer is zero,
+				 goto matching bracket,
+				 otherwise go to next command */
+			},
+			']' => {
+				/* TODO: If byte at data pointer is nonzero,
+				go to matching bracket, otherwise go forward */
 			},
 			'.' => print!("{}", state.memory[state.data_pointer] as char),
 			',' => { /* TODO: Implement user input. */ },
