@@ -105,13 +105,13 @@ fn main() {
 			'+' => state.memory[state.data_pointer] += 1,
 			'-' => state.memory[state.data_pointer] -= 1,
 			'[' => if state.memory[state.data_pointer] == 0 {
-				match matching_brackets.get(&(state.instruction_pointer)) {
+				match matching_brackets.get(&state.instruction_pointer) {
 					Some(bracket_index) => state.instruction_pointer = bracket_index.clone(),
 					None => panic!("No matching bracket!"),
 				}
 			},
 			']' => if state.memory[state.data_pointer] != 0 {
-				match matching_brackets.get(&(state.instruction_pointer)) {
+				match matching_brackets.get(&state.instruction_pointer) {
 					Some(bracket_index) => state.instruction_pointer = bracket_index.clone(),
 					None => panic!("No matching bracket!"),
 				}
