@@ -9,6 +9,7 @@ use std::default::Default;
 struct State {
 	memory: [u8; 30000],
 	instruction_pointer: usize,
+	data_pointer: usize,
 	running: bool,
 	stack: Vec<usize>,
 }
@@ -18,6 +19,7 @@ impl Default for State {
 		State {
 			memory: [0u8; 30000],
 			instruction_pointer: 0,
+			data_pointer: 0,
 			running: true,
 			stack: Vec::new(),
 		}
@@ -81,20 +83,23 @@ fn main() {
 
 	let mut state = State::default();
 	while state.running {
+		print!("{}", characters[state.instruction_pointer]);
 		match characters[state.instruction_pointer] {
-			'>' => state.instruction_pointer += 1,
-			'<' => state.instruction_pointer -= 1,
-			'+' => state.memory[state.instruction_pointer] += 1,
-			'-' => state.memory[state.instruction_pointer] -= 1,
+			'>' => state.data_pointer += 1,
+			'<' => state.data_pointer -= 1,
+			'+' => state.memory[state.data_pointer] += 1,
+			'-' => state.memory[state.data_pointer] -= 1,
 			'[' => state.stack.push(state.instruction_pointer),
 			']' => match state.stack.pop() {
-				Some(value) => state.instruction_pointer = value + 1,
+				Some(value) => state.instruction_pointer = value,
 				None => state.running = false,
 			},
-			'.' => print!("{}", state.memory[state.instruction_pointer] as char),
+			'.' => print!("{}", state.memory[state.data_pointer] as char),
 			',' => { /* TODO: Implement user input. */ },
 			_ => state.running = false,
 		}
+
+		state.instruction_pointer += 1;
 
 		if state.instruction_pointer >= characters.len() {
 			state.running = false;
