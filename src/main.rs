@@ -4,6 +4,25 @@ use std::env;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::Read;
+use std::default::Default;
+
+struct State {
+	memory: [u8; 30000],
+	instruction_pointer: usize,
+	running: bool,
+	stack: Vec<usize>,
+}
+
+impl Default for State {
+	fn default() -> State {
+		State {
+			memory: [0u8; 30000],
+			instruction_pointer: 0,
+			running: true,
+			stack: Vec::new(),
+		}
+	}
+}
 
 fn print_usage(program: &str, options: Options) {
 	let brief = format!("Usage: {} [options] filename", program);
@@ -47,11 +66,38 @@ fn main() {
 	// Read Brainfuck source string from file
 	let _ = reader.read_to_string(program_string);
 
-	// Form vector of characters based on source file
-	let characters: Vec<char> = (&program_string).chars().collect();
+	// Form vector of characters based on source file,
+	// and strip unnecessary characters
+	let mut characters = Vec::new();
+	for character in (&program_string).chars() {
+		if character == '>' || character == '<' ||
+			character == '+' || character == '-' ||
+			character == '.' || character == ',' ||
+			character == '[' || character == ']'
+		{
+			characters.push(character);
+		}
+	}
 
-	// Loop over characters
-	for character in characters {
-		println!("{}", character);
+	let mut state = State::default();
+	while state.running {
+		match characters[state.instruction_pointer] {
+			'>' => state.instruction_pointer += 1,
+			'<' => state.instruction_pointer -= 1,
+			'+' => state.memory[state.instruction_pointer] += 1,
+			'-' => state.memory[state.instruction_pointer] -= 1,
+			'[' => state.stack.push(state.instruction_pointer),
+			']' => match state.stack.pop() {
+				Some(value) => state.instruction_pointer = value + 1,
+				None => state.running = false,
+			},
+			'.' => print!("{}", state.memory[state.instruction_pointer] as char),
+			',' => { /* TODO: Implement user input. */ },
+			_ => state.running = false,
+		}
+
+		if state.instruction_pointer >= characters.len() {
+			state.running = false;
+		}
 	}
 }
