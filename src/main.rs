@@ -47,6 +47,11 @@ fn main() {
 	// Read Brainfuck source string from file
 	let _ = reader.read_to_string(program_string);
 
-	// Temporarily print source file contents
-	println!("{}", program_string);
+	// Form vector of characters based on source file
+	let characters: Vec<char> = (&program_string).chars().collect();
+
+	// Loop over characters
+	for character in characters {
+		println!("{}", character);
+	}
 }
