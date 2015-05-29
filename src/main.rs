@@ -5,6 +5,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::io::Read;
 use std::default::Default;
+use std::collections::HashMap;
 
 struct State {
 	memory: [u8; 30000],
@@ -68,7 +69,7 @@ fn main() {
 
 	// Form vector of characters based on source file,
 	// and strip unnecessary characters
-	let mut characters = Vec::new();
+	let mut characters: Vec<char> = Vec::new();
 	for character in (&program_string).chars() {
 		if character == '>' || character == '<' ||
 			character == '+' || character == '-' ||
@@ -79,6 +80,23 @@ fn main() {
 		}
 	}
 
+	// Find matching brackets
+	let mut bracket_stack = Vec::new();
+	let mut matching_brackets = HashMap::new();
+	for (i, character) in characters.iter().enumerate() {
+		if character == &'[' {
+			bracket_stack.push(i);
+		} else if character == &']' {
+			match bracket_stack.pop() {
+				Some(matching_index) => {
+					matching_brackets.insert(i, matching_index);
+					matching_brackets.insert(matching_index, i);
+				},
+				None => panic!("Invalid program!"),
+			}
+		}
+	}
+
 	let mut state = State::default();
 	while state.running {
 		match characters[state.instruction_pointer] {
@@ -86,14 +104,17 @@ fn main() {
 			'<' => state.data_pointer -= 1,
 			'+' => state.memory[state.data_pointer] += 1,
 			'-' => state.memory[state.data_pointer] -= 1,
-			'[' => {
-				/* TODO: If byte at data pointer is zero,
-				 goto matching bracket,
-				 otherwise go to next command */
+			'[' => if state.memory[state.data_pointer] == 0 {
+				match matching_brackets.get(&(state.instruction_pointer)) {
+					Some(bracket_index) => state.instruction_pointer = bracket_index.clone(),
+					None => panic!("No matching bracket!"),
+				}
 			},
-			']' => {
-				/* TODO: If byte at data pointer is nonzero,
-				go to matching bracket, otherwise go forward */
+			']' => if state.memory[state.data_pointer] != 0 {
+				match matching_brackets.get(&(state.instruction_pointer)) {
+					Some(bracket_index) => state.instruction_pointer = bracket_index.clone(),
+					None => panic!("No matching bracket!"),
+				}
 			},
 			'.' => print!("{}", state.memory[state.data_pointer] as char),
 			',' => { /* TODO: Implement user input. */ },
