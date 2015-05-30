@@ -87,13 +87,9 @@ fn main() {
 		if character == &'[' {
 			bracket_stack.push(i);
 		} else if character == &']' {
-			match bracket_stack.pop() {
-				Some(matching_index) => {
-					matching_brackets.insert(i, matching_index);
-					matching_brackets.insert(matching_index, i);
-				},
-				None => panic!("Invalid program!"),
-			}
+			let matching_index = bracket_stack.pop().unwrap();
+			matching_brackets.insert(i, matching_index);
+			matching_brackets.insert(matching_index, i);
 		}
 	}
 
@@ -105,16 +101,12 @@ fn main() {
 			'+' => state.memory[state.data_pointer] += 1,
 			'-' => state.memory[state.data_pointer] -= 1,
 			'[' => if state.memory[state.data_pointer] == 0 {
-				match matching_brackets.get(&state.instruction_pointer) {
-					Some(bracket_index) => state.instruction_pointer = bracket_index.clone(),
-					None => panic!("No matching bracket!"),
-				}
+				state.instruction_pointer =
+					matching_brackets.get(&state.instruction_pointer).unwrap().clone();
 			},
 			']' => if state.memory[state.data_pointer] != 0 {
-				match matching_brackets.get(&state.instruction_pointer) {
-					Some(bracket_index) => state.instruction_pointer = bracket_index.clone(),
-					None => panic!("No matching bracket!"),
-				}
+				state.instruction_pointer =
+					matching_brackets.get(&state.instruction_pointer).unwrap().clone();
 			},
 			'.' => print!("{}", state.memory[state.data_pointer] as char),
 			',' => { /* TODO: Implement user input. */ },
