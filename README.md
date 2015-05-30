@@ -4,21 +4,23 @@ Brainrust is a Brainfuck interpreter written in Rust.
 
 ## Installation
 
-Brainrust can be compiled normally using Cargo:
+Brainrust can be compiled using Cargo:
 
 ```
 cargo build --release
 ```
+
+The executable is placed in `target/release/`
 
 ## Usage
 
 Brainrust is run simply on the command line using
 
 ```
-brainrust.exe sourcefile
+brainrust.exe sourcefile.b
 ```
 
-At the moment the user input is implemented so that enter must be pressed
+**NOTE:** At the moment the user input is implemented so that `Enter` must be pressed
 to send command line input to the program. Only the first character on the line
 is used.
 
