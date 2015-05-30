@@ -3,7 +3,9 @@ use getopts::Options;
 use std::env;
 use std::fs::File;
 use std::io::BufReader;
+use std::io::BufRead;
 use std::io::Read;
+use std::io::stdin;
 use std::default::Default;
 use std::collections::HashMap;
 
@@ -109,7 +111,12 @@ fn main() {
 					matching_brackets.get(&state.instruction_pointer).unwrap().clone();
 			},
 			'.' => print!("{}", state.memory[state.data_pointer] as char),
-			',' => { /* TODO: Implement user input. */ },
+			',' => {
+				let stdin = stdin();
+				let line = stdin.lock().lines().next().unwrap().unwrap();
+				let character = line.chars().next().unwrap();
+				state.memory[state.data_pointer] = character as u8;
+			},
 			_ => state.running = false,
 		}
 

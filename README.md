@@ -1,6 +1,6 @@
 # Brainrust
 
-Brainrust is a Brainfuck interpreter written in Rust. The interpreter is otherwise fully functional, but does not support user input yet.
+Brainrust is a Brainfuck interpreter written in Rust.
 
 ## Installation
 
@@ -17,6 +17,10 @@ Brainrust is run simply on the command line using
 ```
 brainrust.exe sourcefile
 ```
+
+At the moment the user input is implemented so that enter must be pressed
+to send command line input to the program. Only the first character on the line
+is used.
 
 ## License
 
